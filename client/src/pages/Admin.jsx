@@ -1,151 +1,161 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const Cart = () => {
-  const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(false);
+const Admin = () => {
   const navigate = useNavigate();
+  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    image: '',
+  });
+
+  const user = JSON.parse(localStorage.getItem('user'));
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCart(storedCart);
-  }, []);
-
-  const updateCart = (newCart) => {
-    setCart(newCart);
-    localStorage.setItem('cart', JSON.stringify(newCart));
-  };
-
-  const handleQuantityChange = (index, type) => {
-    const newCart = [...cart];
-    if (type === 'increment') {
-      newCart[index].quantity += 1;
-    } else if (type === 'decrement' && newCart[index].quantity > 1) {
-      newCart[index].quantity -= 1;
-    }
-    updateCart(newCart);
-  };
-
-  const handleRemove = (index) => {
-    const newCart = [...cart];
-    newCart.splice(index, 1);
-    updateCart(newCart);
-  };
-
-  const handleCheckout = async () => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) {
-      alert('Please login to continue checkout.');
-      return navigate('/login');
+    if (!user || user.email !== 'admin@example.com') {
+      alert('Access Denied: Not admin');
+      navigate('/');
+      return;
     }
 
-    const totalAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    const productDetails = cart.map((item) => ({
-      id: item.id,
-      name: item.name,
-      quantity: item.quantity,
-    }));
+    const fetchData = async () => {
+      try {
+        const orderRes = await axios.get(
+          `${import.meta.env.VITE_API_BASE}/admin/orders`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setOrders(orderRes.data.orders);
 
-    setLoading(true);
+        const productRes = await axios.get(
+          `${import.meta.env.VITE_API_BASE}/products/all`
+        );
+        setProducts(productRes.data);
+      } catch (err) {
+        console.error('Admin Fetch Error:', err);
+      }
+    };
 
+    fetchData();
+  }, [navigate, user, token]);
+
+  const handleInputChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE}/payment/create-order`, {
-        amount: totalAmount * 100,
-        cart: productDetails,
-      });
-
-      const { order } = res.data;
-
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY,
-        amount: order.amount,
-        currency: 'INR',
-        name: 'ThinMax Waterproofing',
-        description: 'Cart Checkout',
-        order_id: order.id,
-        handler: async (response) => {
-          alert('Payment Successful!');
-          await axios.post(`${import.meta.env.VITE_API_BASE}/payment/verify`, {
-            ...response,
-            orderId: order.id,
-            cart: productDetails,
-          });
-          updateCart([]);
-        },
-        prefill: {
-          name: user.name,
-          email: user.email,
-        },
-        theme: {
-          color: '#1e40af',
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE}/admin/products`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert('Product added!');
+      setProducts([...products, res.data.product]);
+      setFormData({ name: '', description: '', price: '', image: '' });
     } catch (err) {
-      console.error(err);
-      alert('Payment failed!');
+      console.error('Add product error:', err);
     }
+  };
 
-    setLoading(false);
+  const handleDeleteProduct = async (id) => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE}/admin/products/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert('Product deleted!');
+      setProducts(products.filter((p) => p._id !== id));
+    } catch (err) {
+      console.error('Delete product error:', err);
+    }
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      <h2 className="text-3xl font-bold mb-6 text-center">Your Cart</h2>
-      {cart.length === 0 ? (
-        <p className="text-center text-gray-600">Your cart is empty.</p>
-      ) : (
-        <div className="space-y-6">
-          {cart.map((item, index) => (
-            <div key={index} className="flex items-center justify-between bg-white shadow p-4 rounded-lg">
-              <div>
-                <h3 className="font-semibold text-gray-800">{item.name}</h3>
-                <p className="text-sm text-gray-600">₹{item.price} × {item.quantity}</p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => handleQuantityChange(index, 'decrement')}
-                  className="px-2 py-1 bg-gray-200 rounded"
-                >
-                  -
-                </button>
-                <span>{item.quantity}</span>
-                <button
-                  onClick={() => handleQuantityChange(index, 'increment')}
-                  className="px-2 py-1 bg-gray-200 rounded"
-                >
-                  +
-                </button>
-                <button
-                  onClick={() => handleRemove(index)}
-                  className="ml-4 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))}
+    <div className="max-w-6xl mx-auto py-10 px-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">Admin Panel</h1>
 
-          <div className="text-right mt-4">
-            <p className="text-xl font-bold">
-              Total: ₹
-              {cart.reduce((acc, item) => acc + item.price * item.quantity, 0)}
-            </p>
-            <button
-              onClick={handleCheckout}
-              disabled={loading}
-              className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              {loading ? 'Processing...' : 'Proceed to Pay'}
-            </button>
+      {/* Product Form */}
+      <form
+        onSubmit={handleAddProduct}
+        className="bg-white p-6 rounded shadow mb-8"
+      >
+        <h2 className="text-2xl font-semibold mb-4">Add New Product</h2>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleInputChange}
+          placeholder="Product Name"
+          className="border p-2 w-full mb-2"
+          required
+        />
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleInputChange}
+          placeholder="Description"
+          className="border p-2 w-full mb-2"
+          required
+        />
+        <input
+          type="number"
+          name="price"
+          value={formData.price}
+          onChange={handleInputChange}
+          placeholder="Price"
+          className="border p-2 w-full mb-2"
+          required
+        />
+        <input
+          type="text"
+          name="image"
+          value={formData.image}
+          onChange={handleInputChange}
+          placeholder="Image URL"
+          className="border p-2 w-full mb-2"
+          required
+        />
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Add Product
+        </button>
+      </form>
+
+      {/* Product List */}
+      <h2 className="text-2xl font-semibold mb-4">All Products</h2>
+      {products.map((product) => (
+        <div
+          key={product._id}
+          className="flex justify-between items-center bg-white p-4 rounded shadow mb-2"
+        >
+          <div>
+            <p className="font-bold">{product.name}</p>
+            <p>₹{product.price}</p>
           </div>
+          <button
+            onClick={() => handleDeleteProduct(product._id)}
+            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+          >
+            Delete
+          </button>
         </div>
-      )}
+      ))}
     </div>
   );
 };
 
-export default Cart;
+export default Admin;

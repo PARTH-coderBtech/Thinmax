@@ -1,6 +1,6 @@
 // Proceeding with Header, Footer, and Home Page
 // 1. Header.jsx
-
+import logo from '../assets/logo1.png';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -27,10 +27,10 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-4 py-4">
+    <header className="bg-white shadow sticky top-0 z-40">
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-3 py-3">
         <Link to="/">
-          <img src="/logo.png" alt="ThinMax Logo" className="h-10" />
+          <img src={logo} alt="ThinMax Logo" className="h-[90px]" />
         </Link>
         <nav className="space-x-6 text-gray-700 font-medium flex items-center">
           <Link to="/">Home</Link>
