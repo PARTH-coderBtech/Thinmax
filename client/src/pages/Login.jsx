@@ -16,7 +16,7 @@ const Login = () => {
       });
 
       localStorage.setItem('user', JSON.stringify(res.data));
-      
+      console.log('Login successful:', res.data);
 
       if (res.data?.email === 'admin@example.com') {
         navigate('/admin');

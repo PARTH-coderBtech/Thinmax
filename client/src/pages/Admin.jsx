@@ -50,7 +50,7 @@ const Cart = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE}/api/payment/create-order`, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE}/payment/create-order`, {
         amount: totalAmount * 100,
         cart: productDetails,
       });
@@ -66,7 +66,7 @@ const Cart = () => {
         order_id: order.id,
         handler: async (response) => {
           alert('Payment Successful!');
-          await axios.post(`${import.meta.env.VITE_API_BASE}/api/payment/verify`, {
+          await axios.post(`${import.meta.env.VITE_API_BASE}/payment/verify`, {
             ...response,
             orderId: order.id,
             cart: productDetails,

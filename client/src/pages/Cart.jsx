@@ -107,6 +107,9 @@ const Cart = () => {
   // };
 const handleCheckout = async () => {
   const user = JSON.parse(localStorage.getItem('user'));
+  if(user){
+    alert(`${user.user.name || 'User'}, you are logged in!`);
+  }
   if (!user) {
     alert('Please login to continue checkout.');
     return navigate('/login');

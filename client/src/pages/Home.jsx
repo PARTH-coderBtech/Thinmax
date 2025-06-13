@@ -24,9 +24,10 @@ const Home = () => {
 
   const handleBuyNow = async (product, quantity = 1) => {
     const user = JSON.parse(localStorage.getItem("user")); // Must contain user._id
+    console.log("User:", user);
     await axios.post(`${import.meta.env.VITE_API_BASE}/cart/add`, {
       userId: user._id,
-      productId: item._id,
+      productId: product._id,
       quantity: 1,
     });
 
@@ -68,6 +69,7 @@ const Home = () => {
       console.error('Payment error:', error);
     }
   };
+  console.log("Products:", products);
   const handleAddToCart = async (product, quantity = 1) => {
     const user = JSON.parse(localStorage.getItem('user'));
 
@@ -83,15 +85,13 @@ const Home = () => {
     localStorage.setItem('cart', JSON.stringify(cart));
     localStorage.setItem('user', JSON.stringify({ ...user, token: user.token }));
 
-
     alert('Added to cart!');
-
     if (user) {
       try {
         await axios.post(
           `${import.meta.env.VITE_API_BASE}/cart/add`,
           {
-            userId: user._id,
+            // userId: user._id,
             productId: product._id,
             quantity,
           },
@@ -100,6 +100,7 @@ const Home = () => {
               Authorization: `Bearer ${user.token}`,
             },
           }
+          
         );
       } catch (error) {
         console.error("Backend cart update failed:", error.response?.data || error.message);
@@ -157,6 +158,7 @@ const Home = () => {
                   <button
                     onClick={() => {
                       const qty = document.getElementById(`qty-${product._id}`).value;
+                      console.log('Adding to cart:', product, qty);
                       handleAddToCart(product, parseInt(qty));
                     }}
                     className="ml-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
