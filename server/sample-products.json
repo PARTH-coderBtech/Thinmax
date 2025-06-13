@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Waterproof Roof Sealant",
+    "price": 499,
+    "description": "High-quality sealant for waterproofing roofs and preventing leaks.",
+    "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "name": "Industrial Glue",
+    "price": 299,
+    "description": "Strong adhesive glue suitable for industrial and household use.",
+    "image": "https://images.unsplash.com/photo-1590080877777-721d3b9c7bb7?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "name": "Waterproof Tape",
+    "price": 199,
+    "description": "Durable waterproof tape for quick fixes and sealing cracks.",
+    "image": "https://images.unsplash.com/photo-1581090700227-88f6a3fdbde3?auto=format&fit=crop&w=800&q=80"
+  }
+]
