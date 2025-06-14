@@ -13,10 +13,14 @@ const Admin = () => {
     image: '',
   });
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  const token = localStorage.getItem('token');
-
+  // const user = JSON.parse(localStorage.getItem('user'));
+  // const token = user?.token;
+const stored = JSON.parse(localStorage.getItem('user'));
+const user = stored?.user;
+const token = stored?.token;
   useEffect(() => {
+    console.log('USER:', user);          // 👈 CHECK THIS
+  console.log('TOKEN:', token); 
     if (!user || user.email !== 'admin@example.com') {
       alert('Access Denied: Not admin');
       navigate('/');
