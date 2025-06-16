@@ -13,7 +13,7 @@ const Home = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/products/all');
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE}/products/all`);
       setProducts(res.data);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -58,7 +58,7 @@ const Home = () => {
       if (!scriptLoaded) return alert('Razorpay SDK failed to load.');
 
       const res = await axios.post(
-        'http://localhost:5000/api/payment/create-order',
+        `${import.meta.env.VITE_API_BASE}/payment/create-order`,
         {
           amount: product.price * quantity * 100,
           productId: product._id,
@@ -81,7 +81,7 @@ const Home = () => {
         handler: async function (response) {
           alert('Payment Successful!');
           await axios.post(
-            'http://localhost:5000/api/payment/verify',
+            `${import.meta.env.VITE_API_BASE}/payment/verify`,
             {
               ...response,
               orderId: res.data.order.id,
