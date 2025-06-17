@@ -2,14 +2,15 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const Order = require('../models/Order');
-const razorpay = require('../utils/razorpay'); // your pre-configured Razorpay instance
+const razorpay = require('../utils/razorpay'); // pre-configured Razorpay instance
 
 // Create Razorpay order
 router.post('/create-order', async (req, res) => {
   try {
     const { amount, productName, productId } = req.body;
+
     const options = {
-      amount: amount * 100,   // convert rupees to paise
+      amount: amount,   // amount should already be in paise from frontend
       currency: 'INR',
       receipt: `receipt_${Date.now()}`,
     };
@@ -25,25 +26,41 @@ router.post('/create-order', async (req, res) => {
 // Verify payment signature
 router.post('/verify', async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, productId } = req.body;
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      productId,
+      quantity,
+      name,
+      email,
+      phone,
+      address,
+      pincode
+    } = req.body;
 
     const body = razorpay_order_id + '|' + razorpay_payment_id;
 
-    const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+    const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET)
       .update(body)
       .digest('hex');
 
     if (expectedSignature === razorpay_signature) {
-      // Save order details in DB
       const order = new Order({
         razorpay_order_id,
         razorpay_payment_id,
         productId,
+        quantity,
+        name,
+        email,
+        phone,
+        address,
+        pincode
       });
 
       await order.save();
 
-      return res.status(200).json({ msg: 'Payment successful' });
+      return res.status(200).json({ msg: 'Payment successful and data saved' });
     } else {
       return res.status(400).json({ msg: 'Invalid signature' });
     }
