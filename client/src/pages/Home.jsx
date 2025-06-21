@@ -57,10 +57,10 @@ const Home = () => {
     }
   };
 
-  const singleProductSliderSettings = {
+  const singleSliderSettings = {
     dots: true,
     infinite: true,
-    speed: 800,
+    speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
@@ -85,13 +85,13 @@ const Home = () => {
   };
 
   return (
-    <div className="max-w-9xl mx-auto px-4 py-10">
+    <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold text-center mb-10 text-gray-800">Our Products</h1>
 
       {products.length === 1 ? (
         <div className="flex justify-center">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden w-full sm:w-96">
-            <Slider {...singleProductSliderSettings}>
+            <Slider {...singleSliderSettings}>
               {[...Array(5)].map((_, index) => (
                 <div key={index}>
                   <img
@@ -107,77 +107,54 @@ const Home = () => {
               <p className="text-gray-600 text-sm">{products[0].description}</p>
               <p className="text-lg font-bold text-blue-600 mt-2">₹{products[0].price}</p>
               <div className="flex items-center mt-4">
-                <input
-                  type="number"
-                  min="1"
-                  defaultValue="1"
-                  className="w-16 mr-2 border rounded p-1"
-                  id={`qty-${products[0]._id}`}
-                />
-                <button
-                  onClick={() => {
-                    const qty = document.getElementById(`qty-${products[0]._id}`).value;
-                    navigate(`/product/${products[0]._id}`, { state: { product: products[0], quantity: parseInt(qty) } });
-                  }}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                  Buy Now
-                </button>
+                <input type="number" min="1" defaultValue="1" className="w-16 mr-2 border rounded p-1" id={`qty-${products[0]._id}`} />
+                <button onClick={() => {
+                  const qty = parseInt(document.getElementById(`qty-${products[0]._id}`).value);
+                  navigate(`/product/${products[0]._id}`, { state: { product: products[0], quantity: qty } });
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Buy Now</button>
 
-                <button
-                  onClick={() => {
-                    const qty = document.getElementById(`qty-${products[0]._id}`).value;
-                    handleAddToCart(products[0], parseInt(qty));
-                  }}
-                  className="ml-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                >
-                  Add to Cart
-                </button>
+                <button onClick={() => {
+                  const qty = parseInt(document.getElementById(`qty-${products[0]._id}`).value);
+                  handleAddToCart(products[0], qty);
+                }}
+                className="ml-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Add to Cart</button>
               </div>
             </div>
           </div>
         </div>
       ) : (
         <Slider {...multiProductSliderSettings}>
-          {products.map((product, index) => (
+          {products.map((product) => (
             <div key={product._id} className="p-2">
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-64 object-cover transition-transform duration-300 hover:scale-105"
-                />
+                <Slider {...singleSliderSettings}>
+                  {[...Array(5)].map((_, index) => (
+                    <div key={index}>
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-64 object-cover"
+                      />
+                    </div>
+                  ))}
+                </Slider>
                 <div className="p-4">
                   <h2 className="text-xl font-semibold text-gray-800">{product.name}</h2>
                   <p className="text-gray-600 text-sm">{product.description}</p>
                   <p className="text-lg font-bold text-blue-600 mt-2">₹{product.price}</p>
                   <div className="flex items-center mt-4">
-                    <input
-                      type="number"
-                      min="1"
-                      defaultValue="1"
-                      className="w-16 mr-2 border rounded p-1"
-                      id={`qty-${product._id}`}
-                    />
-                    <button
-                      onClick={() => {
-                        const qty = document.getElementById(`qty-${product._id}`).value;
-                        navigate(`/product/${product._id}`, { state: { product, quantity: parseInt(qty) } });
-                      }}
-                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                      Buy Now
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        const qty = document.getElementById(`qty-${product._id}`).value;
-                        handleAddToCart(product, parseInt(qty));
-                      }}
-                      className="ml-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                    >
-                      Add to Cart
-                    </button>
+                    <input type="number" min="1" defaultValue="1" className="w-16 mr-2 border rounded p-1" id={`qty-${product._id}`} />
+                    <button onClick={() => {
+                      const qty = parseInt(document.getElementById(`qty-${product._id}`).value);
+                      navigate(`/product/${product._id}`, { state: { product, quantity: qty } });
+                    }}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Buy Now</button>
+                    <button onClick={() => {
+                      const qty = parseInt(document.getElementById(`qty-${product._id}`).value);
+                      handleAddToCart(product, qty);
+                    }}
+                    className="ml-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Add to Cart</button>
                   </div>
                 </div>
               </div>
@@ -185,7 +162,6 @@ const Home = () => {
           ))}
         </Slider>
       )}
-
       <WhatsAppIcon />
     </div>
   );

@@ -36,7 +36,13 @@ const Header = () => {
     setIsAdmin(false);
     navigate('/');
   };
-
+  const handleProtectedNavigation = (path) => {
+    if (!isLoggedIn) {
+      alert('Please login first!');
+    } else {
+      navigate(path);
+    }
+  };
   return (
     <header className="bg-white shadow sticky top-0 z-40">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-3 py-3">
@@ -47,7 +53,8 @@ const Header = () => {
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
-          <Link to="/cart">Cart</Link>
+          <button onClick={() => handleProtectedNavigation("/cart")}>Cart</button>
+
           {isAdmin && <Link to="/admin">Admin</Link>}
           {isLoggedIn ? (
             <button
