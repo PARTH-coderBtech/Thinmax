@@ -19,7 +19,7 @@ const Admin = () => {
 
   useEffect(() => {
   const stored = JSON.parse(localStorage.getItem('user'));
-  if (!stored || stored?.user?.email !== 'admin@example.com') {
+  if (!stored || stored?.user?.email !== 'parthagrawal2006asr@gmail.com') {
     alert('Access Denied: Not admin');
     navigate('/');
     return;
