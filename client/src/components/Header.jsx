@@ -10,14 +10,25 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setIsLoggedIn(true);
-      if (user.email === 'admin@example.com') {
-        setIsAdmin(true);
-      }
+  const userData = localStorage.getItem('user');
+  let user = null;
+
+  if (userData && userData !== "undefined") {
+    try {
+      user = JSON.parse(userData);
+    } catch (error) {
+      console.error("Failed to parse user data from localStorage:", error);
     }
-  }, []);
+  }
+
+  if (user) {
+    setIsLoggedIn(true);
+    if (user.email === 'admin@example.com') {
+      setIsAdmin(true);
+    }
+  }
+}, []);
+
 
   const handleLogout = () => {
     localStorage.removeItem('user');
