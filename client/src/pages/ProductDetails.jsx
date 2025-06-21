@@ -49,7 +49,7 @@ const ProductDetails = () => {
         key: import.meta.env.VITE_RAZORPAY_KEY,
         amount: order.amount,
         currency: order.currency,
-        name: "Your Store Name",
+        name: "Indodeeps",
         description: product.name,
         order_id: order.id,
         handler: async (response) => {
@@ -94,7 +94,7 @@ const ProductDetails = () => {
       <img src={product.image} alt={product.name} className="w-96 h-80 object-cover mb-4" />
       <p className="mb-4">{product.description}</p>
       <video controls className="w-96 mb-4">
-        <source src="/src/assets/Howtouse.mp4" type="video/mp4" />
+        <source src="/videos/Howtouse.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       <p className="text-lg font-bold">Quantity: {quantity}</p>
